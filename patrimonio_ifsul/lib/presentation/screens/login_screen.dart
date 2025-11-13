@@ -25,6 +25,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordController.text,
     );
 
+    if (!mounted) return;
+
     if (!success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuário ou senha inválidos')),
@@ -32,11 +34,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     // The navigation will be handled by a wrapper widget listening to auth state
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override

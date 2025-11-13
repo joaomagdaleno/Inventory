@@ -32,6 +32,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
     await userRepository.createUser(newUser);
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Usuário criado com sucesso!')),
     );

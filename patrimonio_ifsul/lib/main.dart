@@ -10,6 +10,7 @@ import 'package:patrimonio_ifsul/presentation/providers/patrimonio_provider.dart
 import 'package:patrimonio_ifsul/presentation/screens/auth_wrapper.dart';
 import 'package:patrimonio_ifsul/presentation/screens/item_detail_screen.dart';
 import 'package:patrimonio_ifsul/presentation/screens/item_form_screen.dart';
+import 'package:patrimonio_ifsul/presentation/screens/item_list_screen.dart';
 import 'package:patrimonio_ifsul/presentation/screens/user_management_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -55,29 +56,34 @@ class MyApp extends StatelessWidget {
         ),
         home: const AuthWrapper(),
         onGenerateRoute: (settings) {
-          if (settings.name == '/item-detail') {
-            final item = settings.arguments as PatrimonioItem;
-            return MaterialPageRoute(
-              builder: (context) => ItemDetailScreen(item: item),
-            );
+          switch (settings.name) {
+            case '/item-detail':
+              if (settings.arguments is PatrimonioItem) {
+                final item = settings.arguments as PatrimonioItem;
+                return MaterialPageRoute(
+                  builder: (context) => ItemDetailScreen(item: item),
+                );
+              }
+              break;
+            case '/edit-item':
+              if (settings.arguments is PatrimonioItem) {
+                final item = settings.arguments as PatrimonioItem;
+                return MaterialPageRoute(
+                  builder: (context) => ItemFormScreen(item: item),
+                );
+              }
+              break;
+            case '/add-item':
+              return MaterialPageRoute(
+                builder: (context) => const ItemFormScreen(),
+              );
+            case '/user-management':
+              return MaterialPageRoute(
+                builder: (context) => const UserManagementScreen(),
+              );
           }
-          if (settings.name == '/edit-item') {
-            final item = settings.arguments as PatrimonioItem;
-            return MaterialPageRoute(
-              builder: (context) => ItemFormScreen(item: item),
-            );
-          }
-          if (settings.name == '/add-item') {
-            return MaterialPageRoute(
-              builder: (context) => const ItemFormScreen(),
-            );
-          }
-          if (settings.name == '/user-management') {
-            return MaterialPageRoute(
-              builder: (context) => const UserManagementScreen(),
-            );
-          }
-          return null;
+          // Fallback route
+          return MaterialPageRoute(builder: (context) => const ItemListScreen());
         },
       ),
     );

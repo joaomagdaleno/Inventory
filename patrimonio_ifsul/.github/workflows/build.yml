@@ -67,3 +67,17 @@ jobs:
           files: |
             artifacts/windows-installer/PatrimonioSetup-*.exe
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  security:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
