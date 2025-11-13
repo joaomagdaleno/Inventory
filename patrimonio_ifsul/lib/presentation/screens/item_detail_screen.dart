@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patrimonio_ifsul/domain/entities/patrimonio_item.dart';
+import 'package:patrimonio_ifsul/domain/entities/user.dart';
+import 'package:patrimonio_ifsul/presentation/providers/auth_provider.dart';
 import 'package:patrimonio_ifsul/presentation/providers/patrimonio_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -36,20 +38,25 @@ class ItemDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final bool canEdit = authProvider.currentUser?.role == UserRole.admin || authProvider.currentUser?.role == UserRole.tecnico;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(item.nome),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/edit-item', arguments: item);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => _deleteItem(context),
-          ),
+          if (canEdit)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/edit-item', arguments: item);
+              },
+            ),
+          if (canEdit)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () => _deleteItem(context),
+            ),
         ],
       ),
       body: Padding(

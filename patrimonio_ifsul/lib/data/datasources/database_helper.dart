@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -20,12 +22,32 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    await _createTables(db);
+    await _seedAdminUser(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT NOT NULL UNIQUE,
+          password TEXT NOT NULL,
+          role TEXT NOT NULL
+        )
+      ''');
+      await _seedAdminUser(db);
+    }
+  }
+
+  Future<void> _createTables(Database db) async {
     await db.execute('''
       CREATE TABLE patrimonio (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,5 +59,24 @@ class DatabaseHelper {
         status TEXT NOT NULL
       )
     ''');
+    await db.execute('''
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _seedAdminUser(Database db) async {
+    final bytes = utf8.encode('admin'); // data being hashed
+    final digest = sha256.convert(bytes);
+
+    await db.insert('users', {
+      'username': 'admin',
+      'password': digest.toString(),
+      'role': 'admin'
+    });
   }
 }
