@@ -1,0 +1,40 @@
+name: Deploy to GitHub Pages (Dev)
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.0'
+          cache: true
+
+      - name: Flutter Pub Get
+        working-directory: patrimonio_ifsul
+        run: flutter pub get
+
+      - name: Build Web App
+        working-directory: patrimonio_ifsul
+        run: flutter build web --release --base-href /${{ github.event.repository.name }}/
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: patrimonio_ifsul/build/web
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
